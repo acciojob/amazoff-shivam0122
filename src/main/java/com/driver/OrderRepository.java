@@ -1,6 +1,8 @@
 package com.driver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,13 +39,17 @@ public class OrderRepository {
 
     //assigning an order to partner
     public void addOrderPartnerPair(String orderId, String partnerId) {
+       List<String> orderList = new ArrayList<>();
        if(orderDetails.containsKey(orderId) && deliveryPartnerDetails.containsKey(partnerId)){
-           List<String> orderList = new ArrayList<>();
-           if(assignedOrdersToPartner.containsKey(orderId)){
+//           List<String> orderList = new ArrayList<>();
+           if(assignedOrdersToPartner.containsKey(partnerId)){
                orderList = assignedOrdersToPartner.get(partnerId);
            }
            orderList.add(orderId);
+
            assignedOrdersToPartner.put(partnerId, orderList);
+           DeliveryPartner deliveryPartner = deliveryPartnerDetails.get(partnerId);
+           deliveryPartner.setNumberOfOrders(deliveryPartner.getNumberOfOrders()+1);
        }
     }
 
@@ -58,9 +64,9 @@ public class OrderRepository {
 
     public Integer findOrderCountByPartnerId(String partnerId) {
 
-       List<String> orderList = assignedOrdersToPartner.get(partnerId);
-       int orderCount = orderList.size();
-       return orderCount;
+       DeliveryPartner deliveryPartner = deliveryPartnerDetails.get(partnerId);
+
+       return deliveryPartner.getNumberOfOrders();
     }
 
     public List<String> findOrdersByPartnerId(String partnerId) {
@@ -71,6 +77,7 @@ public class OrderRepository {
        return orderList;
     }
 
+    //if we have to return objectlist then change this String to object
     public List<String> allOrdersList() {
 
        List<String> orderList = new ArrayList<>();
@@ -81,11 +88,11 @@ public class OrderRepository {
     }
 
     public Integer findCountOfUnassignedOrders() {
-       int totalOrders = 0;
+       int totalOrders = orderDetails.size();
        int assignedOrders = 0;
-       for(String orderId: orderDetails.keySet()){
-           totalOrders++;
-       }
+//       for(String orderId: orderDetails.keySet()){
+//           totalOrders++;
+//       }
        for(String partnerId: assignedOrdersToPartner.keySet()){
 
            assignedOrders += assignedOrdersToPartner.get(partnerId).size();
