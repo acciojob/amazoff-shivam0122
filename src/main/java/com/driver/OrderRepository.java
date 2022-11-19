@@ -95,7 +95,8 @@ public class OrderRepository {
 //       }
        for(String partnerId: assignedOrdersToPartner.keySet()){
 
-           assignedOrders += assignedOrdersToPartner.get(partnerId).size();
+           List<String> orderList = assignedOrdersToPartner.get(partnerId);
+           assignedOrders += orderList.size();
        }
 
        int unassignedOrders = totalOrders - assignedOrders;
@@ -167,8 +168,10 @@ public class OrderRepository {
        for(String partnerId: assignedOrdersToPartner.keySet()){
            List<String> orderList = assignedOrdersToPartner.get(partnerId);
            for(String oID: orderList){
-               if(oID == orderId){
-                   orderList.remove(Integer.valueOf(oID));
+               if(oID.equals(orderId)){
+                   orderList.remove(orderId);
+                   DeliveryPartner deliveryPartner = deliveryPartnerDetails.get(partnerId);
+                   deliveryPartner.setNumberOfOrders(deliveryPartner.getNumberOfOrders()-1);
                    return;
                }
            }
